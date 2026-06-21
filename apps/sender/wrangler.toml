@@ -6,15 +6,15 @@ compatibility_date = "2026-06-20"
 enabled = true
 
 [vars]
-FROM_EMAIL = "newsletter@mondomaine.com"
-FROM_NAME = "Mon Blog"
-UNSUBSCRIBE_BASE_URL = "https://newsletter.mondomaine.com"
+FROM_EMAIL = "newsletter@nortek.wtf"
+FROM_NAME = "Nortek"
+UNSUBSCRIBE_BASE_URL = "https://newsletter.nortek.wtf"
 
 # --- KV : même namespace que le Worker "gateway" ---------------------------
 # Reporter ici le MÊME id que dans apps/gateway/wrangler.toml.
 [[kv_namespaces]]
 binding = "HTML_CACHE"
-id = "REMPLACER_PAR_ID_KV"
+id = "b3ca2d6257914aecbdf4e16f2f3c2583"
 
 # --- Analytics Engine : même dataset que le Worker "gateway" ---------------
 [[analytics_engine_datasets]]

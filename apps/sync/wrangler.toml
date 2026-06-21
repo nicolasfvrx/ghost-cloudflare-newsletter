@@ -2,18 +2,28 @@ name = "newsletter-sync"
 main = "src/index.ts"
 compatibility_date = "2026-06-20"
 
+# Route publique du lien de désinscription (clé de premier niveau : doit précéder les tables).
+# UNSUBSCRIBE_BASE_URL (côté sender) doit pointer vers cette route.
+routes = [
+  { pattern = "newsletter.nortek.wtf/unsubscribe", zone_name = "nortek.wtf" }
+]
+
+# Réconciliation périodique Ghost -> D1 (rattrape les webhooks manqués).
+[triggers]
+crons = ["0 */6 * * *"]
+
 [observability]
 enabled = true
+
+[vars]
+GHOST_API_URL = "https://nortek.wtf"          # URL de votre blog Ghost (à ajuster si besoin)
+# GHOST_NEWSLETTER_ID = "..."                  # optionnel : id d'une newsletter Ghost précise
+# RECONCILE_DELETE = "false"                   # optionnel : désactiver la suppression des absents
+# Secret (NE PAS mettre ici) : wrangler secret put GHOST_ADMIN_API_KEY   (format "id:secret")
 
 # --- D1 : même base que le Worker "gateway" --------------------------------
 # Reporter ici le MÊME database_id que dans apps/gateway/wrangler.toml.
 [[d1_databases]]
 binding = "DB"
 database_name = "newsletter"
-database_id = "REMPLACER_PAR_ID_D1"
-
-# --- Route publique pour le lien de désinscription (à adapter) -------------
-# UNSUBSCRIBE_BASE_URL (côté sender) doit pointer vers cette route.
-# routes = [
-#   { pattern = "newsletter.mondomaine.com/unsubscribe", zone_name = "mondomaine.com" }
-# ]
+database_id = "dd7c539c-26a6-43ce-a3fb-e0363e20c5b9"

@@ -50,10 +50,20 @@ export interface GatewayEnv {
 }
 
 // ---------------------------------------------------------------------------
-// Worker "sync" : gestion de la base D1.
+// Worker "sync" : gestion de la base D1 + réconciliation via l'API Ghost Admin.
 // ---------------------------------------------------------------------------
 export interface SyncEnv {
+  // Binding
   DB: D1Database;
+
+  // API Ghost Admin (réconciliation + sync-back de désinscription)
+  GHOST_API_URL: string; // ex: https://nortek.wtf
+  GHOST_ADMIN_API_KEY: string; // secret, format "id:secret"
+
+  // Optionnel : cibler une newsletter précise (sinon « abonné » = au moins une newsletter)
+  GHOST_NEWSLETTER_ID?: string;
+  // Optionnel : "false" pour désactiver la suppression des membres absents de Ghost
+  RECONCILE_DELETE?: string;
 }
 
 // ---------------------------------------------------------------------------

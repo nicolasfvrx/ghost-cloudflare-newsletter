@@ -74,7 +74,34 @@ pnpm db:init:local    # base locale (développement)
 ```bash
 # Secret de signature des webhooks Ghost (à définir pour le gateway) :
 cd apps/gateway && wrangler secret put GHOST_WEBHOOK_SECRET
+
+# Clé Admin API Ghost, format "id:secret" (à définir pour le sync) :
+cd apps/sync && wrangler secret put GHOST_ADMIN_API_KEY
 ```
+
+## Synchronisation Ghost ↔ Cloudflare
+
+Les webhooks (temps réel) sont complétés par une **réconciliation périodique** via l'API Ghost
+Admin, pour rattraper les webhooks éventuellement manqués.
+
+- **Réconciliation Ghost → D1** : le Worker `sync` tourne via cron (`apps/sync/wrangler.toml`,
+  défaut `0 */6 * * *`). Il parcourt tous les membres Ghost, fait un `upsert` dans D1, puis
+  **supprime les membres absents de Ghost** (webhook `member.deleted` manqué). Cette suppression a
+  un garde-fou (jamais déclenchée si Ghost ne renvoie aucun membre) et peut être désactivée via
+  la variable `RECONCILE_DELETE = "false"`. Déclenchement manuel possible : `POST /reconcile`.
+- **Sync-back de désinscription Cloudflare → Ghost** : quand un membre clique « Se désinscrire »,
+  `sync` met `subscribed = 0` dans D1 **et** propage la désinscription vers Ghost (source de
+  vérité), sinon la réconciliation suivante le ré-abonnerait.
+- Variables (`apps/sync/wrangler.toml`) : `GHOST_API_URL` (URL du blog Ghost), `GHOST_NEWSLETTER_ID`
+  (optionnel, pour cibler une newsletter précise), `RECONCILE_DELETE` (optionnel).
+
+### Côté Ghost
+
+Dans **Ghost Admin → Settings → Integrations → Add custom integration** :
+1. Récupérer l'**Admin API Key** (format `id:secret`) → secret `GHOST_ADMIN_API_KEY` du `sync`.
+2. Renseigner l'URL du blog dans `GHOST_API_URL`.
+3. Désactiver l'envoi natif des newsletters par Ghost (Mailgun) pour éviter les doublons : la
+   diffusion est désormais assurée par les Workers.
 
 ## Vérification des types
 
