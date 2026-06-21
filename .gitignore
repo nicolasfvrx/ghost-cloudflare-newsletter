@@ -1,0 +1,14 @@
+node_modules/
+.wrangler/
+dist/
+*.log
+
+# Variables locales wrangler (secrets de dev)
+.dev.vars
+.dev.vars.*
+
+# OS / éditeurs
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json

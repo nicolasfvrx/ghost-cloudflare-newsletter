@@ -1,0 +1,60 @@
+name = "newsletter-gateway"
+main = "src/index.ts"
+compatibility_date = "2026-06-20"
+
+# Monitoring natif (logs + traces) consultable dans le dashboard Workers.
+[observability]
+enabled = true
+
+[observability.logs]
+enabled = true
+
+[vars]
+CDN_BASE_URL = "https://cdn-newsletter.mondomaine.com"
+FROM_NAME = "Mon Blog"
+EMAIL_IMAGE_WIDTH = "1200"
+# Secret (NE PAS mettre ici) : wrangler secret put GHOST_WEBHOOK_SECRET
+
+# --- D1 : base des membres -------------------------------------------------
+# Remplacer database_id par l'id renvoyé par `wrangler d1 create newsletter`
+# (le même id doit être reporté dans apps/sync/wrangler.toml).
+[[d1_databases]]
+binding = "DB"
+database_name = "newsletter"
+database_id = "REMPLACER_PAR_ID_D1"
+
+# --- KV : cache du HTML pré-rendu ------------------------------------------
+# Remplacer id par celui renvoyé par `wrangler kv namespace create HTML_CACHE`
+# (le même id doit être reporté dans apps/sender/wrangler.toml).
+[[kv_namespaces]]
+binding = "HTML_CACHE"
+id = "REMPLACER_PAR_ID_KV"
+
+# --- R2 : stockage des images optimisées (CDN public attaché au bucket) ----
+[[r2_buckets]]
+binding = "MEDIA"
+bucket_name = "newsletter-media"
+
+# --- Queue : producteur des lots d'envoi -----------------------------------
+[[queues.producers]]
+binding = "SEND_QUEUE"
+queue = "newsletter-send"
+
+# --- Analytics Engine : métriques de traitement ----------------------------
+[[analytics_engine_datasets]]
+binding = "ANALYTICS"
+dataset = "newsletter_events"
+
+# --- Service binding vers le Worker "sync" ---------------------------------
+[[services]]
+binding = "SYNC"
+service = "newsletter-sync"
+
+# --- Optionnel : binding Cloudflare Images (alternative à cf.image) --------
+# [images]
+# binding = "IMAGES"
+
+# --- Route publique (à adapter à votre domaine) ----------------------------
+# routes = [
+#   { pattern = "newsletter.mondomaine.com/webhooks/*", zone_name = "mondomaine.com" }
+# ]

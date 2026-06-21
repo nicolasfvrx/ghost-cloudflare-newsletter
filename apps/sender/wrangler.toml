@@ -1,0 +1,36 @@
+name = "newsletter-sender"
+main = "src/index.ts"
+compatibility_date = "2026-06-20"
+
+[observability]
+enabled = true
+
+[vars]
+FROM_EMAIL = "newsletter@mondomaine.com"
+FROM_NAME = "Mon Blog"
+UNSUBSCRIBE_BASE_URL = "https://newsletter.mondomaine.com"
+
+# --- KV : même namespace que le Worker "gateway" ---------------------------
+# Reporter ici le MÊME id que dans apps/gateway/wrangler.toml.
+[[kv_namespaces]]
+binding = "HTML_CACHE"
+id = "REMPLACER_PAR_ID_KV"
+
+# --- Analytics Engine : même dataset que le Worker "gateway" ---------------
+[[analytics_engine_datasets]]
+binding = "ANALYTICS"
+dataset = "newsletter_events"
+
+# --- Cloudflare Email Sending (Email Service, bêta publique) ---------------
+# remote = true => envois réels même lors d'un `wrangler dev` local.
+[[send_email]]
+name = "EMAIL"
+remote = true
+
+# --- Queue : consumer des lots d'envoi -------------------------------------
+[[queues.consumers]]
+queue = "newsletter-send"
+max_batch_size = 100
+max_batch_timeout = 30
+max_retries = 3
+dead_letter_queue = "newsletter-send-dlq"

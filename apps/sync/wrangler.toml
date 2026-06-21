@@ -1,0 +1,19 @@
+name = "newsletter-sync"
+main = "src/index.ts"
+compatibility_date = "2026-06-20"
+
+[observability]
+enabled = true
+
+# --- D1 : même base que le Worker "gateway" --------------------------------
+# Reporter ici le MÊME database_id que dans apps/gateway/wrangler.toml.
+[[d1_databases]]
+binding = "DB"
+database_name = "newsletter"
+database_id = "REMPLACER_PAR_ID_D1"
+
+# --- Route publique pour le lien de désinscription (à adapter) -------------
+# UNSUBSCRIBE_BASE_URL (côté sender) doit pointer vers cette route.
+# routes = [
+#   { pattern = "newsletter.mondomaine.com/unsubscribe", zone_name = "mondomaine.com" }
+# ]

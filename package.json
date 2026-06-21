@@ -1,0 +1,18 @@
+{
+  "name": "ghost-cloudflare-email",
+  "version": "0.0.0",
+  "private": true,
+  "packageManager": "pnpm@10.32.1",
+  "description": "Newsletter serverless sur Cloudflare (3 Workers) en remplacement de Mailgun pour Ghost CMS",
+  "scripts": {
+    "typecheck": "pnpm -r typecheck",
+    "deploy": "pnpm --filter @newsletter/sync deploy && pnpm --filter @newsletter/sender deploy && pnpm --filter @newsletter/gateway deploy",
+    "db:init": "wrangler d1 execute newsletter --remote --file=./db/schema.sql",
+    "db:init:local": "wrangler d1 execute newsletter --local --file=./db/schema.sql"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250620.0",
+    "typescript": "^5.6.3",
+    "wrangler": "^4.20.0"
+  }
+}
